@@ -5,9 +5,8 @@
 #define BUTTON_RCC_GPIO RCC_APB2Periph_GPIOA
 #define BUTTON_GPIO GPIOA
 #define BUTTON_GPIO_PIN GPIO_Pin_1
-#define L3_RCC_GPIO RCC_APB2Periph_GPIOB
 
-static bool state = true;
+#define L3_RCC_GPIO RCC_APB2Periph_GPIOB
 
 int main(void) {
 	GPIO_InitTypeDef GPIO_InitStruct;
@@ -16,6 +15,8 @@ int main(void) {
 	// GPIO clock for I/O
 	RCC_APB2PeriphClockCmd(BUTTON_RCC_GPIO, ENABLE);
 	RCC_APB2PeriphClockCmd(L3_RCC_GPIO, ENABLE);
+	
+	
 		
 	// Configure I/O for L3
 	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_8;
@@ -46,15 +47,17 @@ int main(void) {
 	while(1) {}
 }
 
+bool state = true;
+
 void TIM2_IRQHandler(void) {
 	if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET) {
-	if(state == 1) {
-		GPIO_SetBits(GPIOB, GPIO_Pin_8);
-		state = 0;
-	} else {
-		GPIO_ResetBits(GPIOB, GPIO_Pin_8);
-		state = 1;
-	}
-	TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
+		if(state) {
+			GPIO_SetBits(GPIOB, GPIO_Pin_8);
+			state = 0;
+		} else {
+			GPIO_ResetBits(GPIOB, GPIO_Pin_8);
+			state = 1;
+		}
+		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
 	}													
 }
